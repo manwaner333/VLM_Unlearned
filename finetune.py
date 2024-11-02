@@ -251,20 +251,6 @@ def main(cfg):
         processor=processor,
     )
 
-    # torch_format_dataset = torch_format_dataset[:100]
-
-    
-    # for index in [100]:
-    #     input_ids = torch_format_dataset[index+5]['input_ids']
-    #     labels  = torch_format_dataset[index+5]['labels']
-    #     labels[labels == -100] = 0
-        
-    #     print("="*50)
-    #     print(tokenizer.decode(input_ids))
-    #     print(tokenizer.decode(labels))
-
-    # sys.exit(0)
-
     
     batch_size, workers = cfg.batch_size, cfg.workers
     gradient_accumulation_steps = cfg.gradient_accumulation_steps
@@ -277,36 +263,7 @@ def main(cfg):
         collate_fn=custom_data_collator(tokenizer=tokenizer),
     )
 
-    # model.half().cuda()
-    # model.eval()
-
-    # for batch in torch_format_dataloader:
-    #     category = batch.pop("category")
-    #     for k,v in batch.items():
-    #         batch[k] = v.to(model.device)
-    #         print(k, v.shape)
-
-    #     with torch.no_grad():
-    #         outputs = model(**batch)
-   
-    #     logits = outputs.logits
-    #     labels = batch['labels']
-    #     labels = labels[labels != -100].unsqueeze(0)
-    #     logits = logits[:, -labels.shape[1]:, :]
-        
-    #     log_probs = F.log_softmax(logits[0, :], dim=-1)        
-    #     top5_values, top5_indices = torch.topk(log_probs, k=5, dim=-1)
-    #     # print("Top 5 values for each token:\n", top5_values)
-    #     # print("Top 5 indices for each token:\n", top5_indices)
-
-    #     print(labels)
-    #     print(tokenizer.decode(labels[0]))
-    #     print(outputs.loss)
-        
-    #     break
-
-    # sys.exit(0)
-    
+ 
                 
     def get_grouped_params(model):
         def apply_decay(x):
