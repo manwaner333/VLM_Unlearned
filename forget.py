@@ -258,62 +258,6 @@ def main(cfg):
         collate_fn=custom_data_collator_forget(tokenizer=tokenizer),
     )
 
-    # model.half().cuda()
-    # model.eval()
-     
-    # index = 0
-    # for batch in torch_format_dataloader:
-    #     forget_inputs, retain_inputs = batch
-
-    #     for k,v in forget_inputs.items():
-    #         forget_inputs[k] = v.to(model.device)
-           
-    #     with torch.no_grad():
-    #         outputs = model(**forget_inputs)
-
-    #     print(outputs.loss)
-   
-    #     logits = outputs.logits
-    #     labels = forget_inputs['labels']
-    #     labels = labels[labels != -100].unsqueeze(0)
-    #     logits = logits[:, -labels.shape[1]:, :]
-        
-    #     log_probs = F.log_softmax(logits[0, :], dim=-1)        
-    #     top5_values, top5_indices = torch.topk(log_probs, k=5, dim=-1)
-    #     # print("Top 5 values for each token:\n", top5_values)
-    #     # print("Top 5 indices for each token:\n", top5_indices)
-
-    #     print(labels)
-    #     print(tokenizer.decode(labels[0]))
-    #     print(outputs.loss)
-
-        # input_ids = forget_inputs['input_ids'][index]
-        # labels  = forget_inputs['labels'][index]
-        # labels[labels == -100] = 0
-        
-        # print("="*50)
-        # print(tokenizer.decode(input_ids))
-        # print(tokenizer.decode(labels))
-
-        # input_ids = retain_inputs['input_ids'][index]
-        # labels  = retain_inputs['labels'][index]
-        # labels[labels == -100] = 0
-        
-        # print("="*50)
-        # print(tokenizer.decode(input_ids))
-        # print(tokenizer.decode(labels))
-
-        # for k, v in forget_inputs.items():
-        #     print(k, v.shape)
-
-        # for k, v in retain_inputs.items():
-        #     print(k, v.shape)
-
-    #     break
-
-    # sys.exit(0)
-
-    
 
     if cfg.LoRA.r == 0:
         for n, p in model.named_parameters():
