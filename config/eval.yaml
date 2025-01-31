@@ -1,28 +1,59 @@
-model_path: ./models/vlm_unlearning_ft_llava_phi_3_mini
-model_family: llava-phi
+# model_path: ./models/vlm_unlearning_ft_llava_phi_3_mini
+# model_family: llava-phi
+model_path: ./models/final_ft_1_epochs_lr1e-05_llava-v1.6-vicuna_full/step_100
+model_family: llava-v1.6-vicuna
 LoRA:
   r: 128
   alpha: 256
   dropout: 0.05
-  lora_path: ./models/vlm_unlearning_ft_llava_phi_3_mini/kl_0.0001_forget5_5/checkpoint.pt
-
-
+  lora_path: ./models/final_ft_1_epochs_lr1e-05_llava-v1.6-vicuna_full/step_100/idk_0.0001_forget10_1/step_36/checkpoint.pt
 save_dir: ${model_path}/eval_results/
 
-data_path: [./dataset/full.json, ./dataset/full.json]
+# data_path: [./dataset/full.json, ./dataset/full.json]
+# split_list:
+#   - forget5
+#   - retain5
+
+# question_key: [question, question]
+# robust_question_key: [paraphrased_question, question]
+# answer_key: [answer, answer]
+
+# base_answer_key: [paraphrased_answer, paraphrased_answer]
+# perturbed_answer_key: [perturbed_answer, perturbed_answer]
+
+# eval_task: [eval_forget_log, eval_retain_log]
+# robust_eval: [[exact, match], [rouge, ]]  # exact, match, ape
+
+
+data_path: [./dataset/full.json]
 split_list:
-  - forget5
-  - retain5
+  - forget10
 
-question_key: [question, question]
-robust_question_key: [paraphrased_question, question]
-answer_key: [answer, answer]
+question_key: [question]
+robust_question_key: [paraphrased_question]
+answer_key: [answer]
 
-base_answer_key: [paraphrased_answer, paraphrased_answer]
-perturbed_answer_key: [perturbed_answer, perturbed_answer]
+base_answer_key: [paraphrased_answer]
+perturbed_answer_key: [perturbed_answer]
 
-eval_task: [eval_forget_log, eval_retain_log]
-robust_eval: [[exact, match, ape], [rouge, ]]
+eval_task: [eval_forget_log]
+robust_eval: [[exact]] 
+
+
+
+# data_path: [./dataset/full.json]
+# split_list:
+#   - retain
+
+# question_key: [question]
+# robust_question_key: [question]
+# answer_key: [answer]
+
+# base_answer_key: [paraphrased_answer]
+# perturbed_answer_key: [perturbed_answer]
+
+# eval_task: [eval_retain_log]
+# robust_eval: [[rouge]]  # exact, match, ape
 
 
 generation:

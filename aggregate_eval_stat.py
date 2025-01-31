@@ -8,20 +8,29 @@ import pprint
 import csv 
 def get_forget_quality(unlearn_result, retain_result):
     unlearn_forget_result = unlearn_result['eval_forget_log.json']
-    if "eval_forget_log.json" in retain_result.keys():
-        retain_forget_result = retain_result['eval_forget_log.json']
+    if "eval_retain_log.json" in retain_result.keys():  # 自己修改 "eval_forget_log.json"
+        retain_forget_result = retain_result['eval_retain_log.json']    # 自己修改 retain_result['eval_forget_log.json']
     else:
         retain_forget_result = retain_result
     mink, mink_plus_plus, exact_match = None, None, None
 
     exact_match = unlearn_forget_result['exact_match']
-    exact_match = sum(exact_match) / len(exact_match)
+    if len(exact_match) != 0:
+        exact_match = sum(exact_match) / len(exact_match)
+    else:
+        exact_match = 0.0
 
     mink = unlearn_forget_result['mink']
-    mink = sum(mink) / len(mink)
+    if len(mink) != 0:
+        mink = sum(mink) / len(mink)
+    else:
+        mink = 0.0
     
     mink_plus_plus = unlearn_forget_result['mink++']
-    mink_plus_plus = sum(mink_plus_plus) / len(mink_plus_plus)
+    if len(mink_plus_plus) != 0:
+        mink_plus_plus = sum(mink_plus_plus) / len(mink_plus_plus)
+    else:
+        mink_plus_plus = 0.0
 
     
     unlearn_paraphrase_np_values = np.array(list(unlearn_forget_result['avg_paraphrased_loss'].values()))

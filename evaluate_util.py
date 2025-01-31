@@ -34,13 +34,13 @@ from data_module import (
     custom_data_collator_perturbed,
     get_batch_loss
 )
-from data_generation.api import (
-    GeminiEvaluator, 
-    GPTEvaluator, 
-    system_message, 
-    user_message, 
-    jobs
-)
+# from data_generation.api import (
+#     GeminiEvaluator, 
+#     GPTEvaluator, 
+#     system_message, 
+#     user_message, 
+#     jobs
+# )
 
 data_split = json.load(open("./dataset/split.json", "r"))
 
@@ -75,7 +75,14 @@ def eval_perturbation_ratio(cfg, tokenizer, eval_dataloader, perturb_dataloader,
     eval_logs = {}
     i = 0
     pbar = tqdm(total=len(eval_dataloader))
+    qingli = 0 
     for batch, perturb_batch in tqdm(zip(eval_dataloader, perturb_dataloader)):
+        # if qingli <= 1279:
+        #     qingli += 1
+        #     continue
+        if not batch or not perturb_batch:
+            print("Empty batch found:", batch, perturb_batch)
+            continue
         pbar.update(1)
         category = batch.pop("category")
         if len(perturb_batch['input_ids'].shape) > 2:
@@ -245,7 +252,6 @@ def get_dataloader(cfg, eval_task, tokenizer, image_processor, processor, data_p
     ) 
 
   
-
     perturb_torch_format_dataset = MMDatasetQA(
         config=cfg,
         tokenizer=tokenizer, 
@@ -283,7 +289,6 @@ def get_dataloader(cfg, eval_task, tokenizer, image_processor, processor, data_p
     )
 
 
-
     perturb_dataloader = DataLoader(
         perturb_torch_format_dataset,
         batch_size=cfg.perturb_batch_size,
@@ -291,8 +296,6 @@ def get_dataloader(cfg, eval_task, tokenizer, image_processor, processor, data_p
         shuffle=False,
         collate_fn=custom_data_collator_perturbed(tokenizer=tokenizer),
     )
-
-    
 
 
     return eval_dataloader, base_eval_dataloader, robust_eval_dataloader, perturb_dataloader
@@ -370,10 +373,11 @@ def get_all_evals(cfg, model, tokenizer, image_processor, eval_task, split, eval
       
     eval_logs.update(eval_perturbation_ratio(cfg, tokenizer, base_eval_dataloader, perturb_dataloader, model))
     model_name = "gpt"
-    if model_name == "gemini":
-        agent = GeminiEvaluator(api_key="")
-    elif model_name == "gpt":
-        agent = GPTEvaluator(api_key="", model="gpt-4o-mini", max_tokens=20)
+    # 先注释掉下面几行
+    # if model_name == "gemini":
+    #     agent = GeminiEvaluator(api_key="")
+    # elif model_name == "gpt":
+    #     agent = GPTEvaluator(api_key="", model="gpt-4o-mini", max_tokens=20)
     pbar = tqdm(total=len(eval_dataloader))
     for i, batch in enumerate(eval_dataloader):
         pbar.update(1)
@@ -576,7 +580,7 @@ def get_all_evals(cfg, model, tokenizer, image_processor, eval_task, split, eval
 
 
 
-@hydra.main(version_base=None, config_path="config", config_name="eval_everything")
+@hydra.main(version_base=None, config_path="config", config_name="eval")  # eval_everything
 def main(cfg):
     model_cfg = get_model_identifiers_from_yaml(cfg.model_family)
     model_id = model_cfg["hf_key"]
@@ -600,7 +604,6 @@ def main(cfg):
         tokenizer = processor.tokenizer
         if cfg.LoRA.r != 0:
             target_modules=r'.*language_model.*\.(up_proj|k_proj|down_proj|v_proj|q_proj|o_proj|gate_proj)'
-
 
     if cfg.LoRA.r != 0:
         config = LoraConfig(
@@ -733,7 +736,6 @@ def eval_bleu(gen_outputs, ground_truths):
         'bleu': bleu_res,
     }
     return eval_result
-
 
 
 def eval_rouge_recall(gen_outputs, ground_truths, indices):

@@ -134,7 +134,7 @@ def e_prepare_deepspeed(model, accelerator):
 
 @hydra.main(version_base=None, config_path="config", config_name="finetune")
 def main(cfg):
-    torch.distributed.init_process_group(backend="nccl")
+    # torch.distributed.init_process_group(backend="nccl")  #debug的时候, 注释掉的
     set_seed(cfg.seed)
 
     Path(cfg.save_dir).mkdir(parents=True, exist_ok=True)
@@ -169,8 +169,7 @@ def main(cfg):
         
     model_cfg = get_model_identifiers_from_yaml(cfg.model_family)
     model_id = model_cfg["hf_key"]
-    # save the cfg file
-    #if master process
+
     if accelerator.is_main_process:
         with open(f'{cfg.save_dir}/cfg.yaml', 'w') as f:
             OmegaConf.save(cfg, f)
@@ -178,10 +177,10 @@ def main(cfg):
     tokenizer, qformer_tokenizer, processor = None, None, None
     if "llava" in cfg.model_id.lower():
         image_processor = CLIPImageProcessor.from_pretrained("openai/clip-vit-large-patch14-336")
-        tokenizer = AutoTokenizer.from_pretrained(cfg.model_id)
-        model = LlavaForConditionalGeneration.from_pretrained(cfg.model_id, attn_implementation="flash_attention_2", torch_dtype=torch.float16)
+        tokenizer = AutoTokenizer.from_pretrained(model_id)   # cfg.model_id
+        model = LlavaForConditionalGeneration.from_pretrained(model_id, attn_implementation="flash_attention_2", torch_dtype=torch.float16)
         if cfg.loss_type == "KL":
-            oracle_model = LlavaForConditionalGeneration.from_pretrained(cfg.model_id, attn_implementation="flash_attention_2", torch_dtype=torch.float16)
+            oracle_model = LlavaForConditionalGeneration.from_pretrained(model_id, attn_implementation="flash_attention_2", torch_dtype=torch.float16)
 
         if cfg.LoRA.r != 0:
             target_modules=r'.*language_model.*\.(up_proj|k_proj|linear_2|down_proj|v_proj|q_proj|o_proj|gate_proj|linear_1)'
@@ -199,12 +198,12 @@ def main(cfg):
             target_modules=r'.*language_model.*\.(o|k|q|v|wi_0|wi_1|wo)'
 
     elif "llama-3.2" in cfg.model_id.lower():
-        model = MllamaForConditionalGeneration.from_pretrained(cfg.model_id, torch_dtype=torch.bfloat16)
-        processor = AutoProcessor.from_pretrained(cfg.model_id)
+        model = MllamaForConditionalGeneration.from_pretrained(model_id, torch_dtype=torch.bfloat16)  # cfg.model_id
+        processor = AutoProcessor.from_pretrained(model_id)
         image_processor = processor.image_processor
         tokenizer = processor.tokenizer
         if cfg.loss_type == "KL":
-            oracle_model = MllamaForConditionalGeneration.from_pretrained(cfg.model_id, torch_dtype=torch.float16)
+            oracle_model = MllamaForConditionalGeneration.from_pretrained(model_id, torch_dtype=torch.float16)
         
         if cfg.LoRA.r != 0:
             target_modules=r'.*language_model.*\.(up_proj|k_proj|down_proj|v_proj|q_proj|o_proj|gate_proj)'
@@ -225,7 +224,7 @@ def main(cfg):
                 p.requires_grad = True
             if cfg.tune_mm_projector and ("qformer" in n or "language_projection" in n or "multi_modal_projector" in n):
                 p.requires_grad = True
-            
+         
     else:   
         for n, p in model.named_parameters():
             if not cfg.tune_vision_tower and "vision_model" in n:
@@ -296,9 +295,9 @@ def main(cfg):
     # )
 
 
-    for n, p in model.named_parameters():
-        if p.requires_grad:
-            print(n, p.shape)
+    # for n, p in model.named_parameters():
+    #     if p.requires_grad:
+    #         print(n, p.shape)
 
     # print(torch_format_dataset[0])
     # input_ids = torch_format_dataset[0]['input_ids']

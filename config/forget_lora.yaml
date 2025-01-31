@@ -1,5 +1,9 @@
-model_family: llava-phi
-model_path: ./models/final_ft_10_epochs_lr2e-05_llava-phi_full
+# model_family: llava-phi
+# model_path: ./models/final_ft_10_epochs_lr2e-05_llava-phi_full
+
+model_family: llava-v1.6-vicuna
+model_path: ./models/final_ft_1_epochs_lr1e-05_llava-v1.6-vicuna_full/step_100
+# model_path: ./models/final_ft_1_epochs_lr1e-05_llava-v1.6-vicuna_retain_new/step_210
 
 LoRA:
   r: 128
@@ -9,13 +13,13 @@ LoRA:
 lr: 1e-4
 split: forget10
 data_path: ./dataset/full.json
-batch_size: 4
+batch_size: 1  # 4
 gradient_accumulation_steps: 16
-num_epochs: 5
-forget_loss: idk
-tune_vision_tower: False
-tune_mm_projector: True
-tune_language_model: True
+num_epochs: 1  # 5
+forget_loss: idk  # kl  # gd  # idk
+tune_vision_tower: False  # False
+tune_mm_projector: False
+tune_language_model: True   # True
 max_grad_norm: 1.0
 
 save_dir: ${model_path}/${forget_loss}_${lr}_${split}_${num_epochs}

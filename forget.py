@@ -150,7 +150,7 @@ def e_prepare_deepspeed(model, accelerator):
     return model
     
 
-@hydra.main(version_base=None, config_path="config", config_name="forget")
+@hydra.main(version_base=None, config_path="config", config_name="forget_lora")  # forget
 def main(cfg):
     set_seed(cfg.seed)
     

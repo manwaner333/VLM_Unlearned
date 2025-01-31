@@ -1,5 +1,9 @@
+# model_family: llava-v1.6-vicuna
+# model_path: models/vlm_unlearned_ft_llava_v1.6_vicuna_7b
+
 model_family: llava-v1.6-vicuna
-model_path: models/vlm_unlearned_ft_llava_v1.6_vicuna_7b
+model_path: models/final_ft_1_epochs_lr1e-05_llava-v1.6-vicuna_retain/step_420
+
 
 LoRA:
   r: 0

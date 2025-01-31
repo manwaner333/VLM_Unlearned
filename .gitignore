@@ -1,0 +1,9 @@
+dataset/
+models/
+outputs/
+wandb/
+*.png
+.vscode/
+__pycache__/*
+eval/__pycache__/*
+llava.egg-info/*

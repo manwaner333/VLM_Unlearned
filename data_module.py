@@ -87,13 +87,15 @@ class MMDatasetQA(Dataset):
         self.model_configs = get_model_identifiers_from_yaml(config.model_family)
         
         self.samples = []
-        self.data = self.data[:400] ### choose 400 person for evaluation
+        self.data = self.data[:400] ### self.data[:400] choose 400 person for evaluation
         if split is not None:
             if split in data_split.keys():
                 self.data = [line for line in self.data if line['unique_id'] in data_split[split]]
             elif split == "retain":
                 ignore_index = data_split['forget1'] + data_split['forget5'] + data_split['forget10'] 
                 self.data = [line for line in self.data if line['unique_id'] not in ignore_index]
+            elif split == "full":
+                self.data = [line for line in self.data]
         
         for line in self.data:
             qa_list = line['qa_list']

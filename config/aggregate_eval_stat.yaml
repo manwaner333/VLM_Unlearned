@@ -1,7 +1,15 @@
+# split: retain5
+# retain_result: ./results/final_ft_10_epochs_lr2e-05_llava-phi_retain/forget1_eval_forget_log.json
+# ckpt_path: ./results/forget1/kl_0.0001_forget1_5
+# ckpt_result: ${ckpt_path}/${split}_eval_log_aggregated.json
+# method_name: temp
+# submitted_by: yingzi
+# save_file: ${ckpt_path}/aggr_result.csv
+
 split: retain5
-retain_result: ./results/final_ft_10_epochs_lr2e-05_llava-phi_retain/forget1_eval_forget_log.json
-ckpt_path: ./results/forget1/kl_0.0001_forget1_5
-ckpt_result: ${ckpt_path}/${split}_eval_log_aggregated.json
+retain_result: ./models/final_ft_1_epochs_lr1e-05_llava-v1.6-vicuna_full/step_100/gd_0.0001_forget10_1/step_36/eval_results/retain_eval_log_aggregated.json           # forget5_eval_forget_log.json
 method_name: temp
 submitted_by: yingzi
-save_file: ${ckpt_path}/aggr_result.csv
+save_file: ./models/final_ft_1_epochs_lr1e-05_llava-v1.6-vicuna_full/step_100/gd_0.0001_forget10_1/step_36/eval_results/aggr_result.csv
+ckpt_path: ./results/forget1/kl_0.0001_forget1_5
+ckpt_result: ./models/final_ft_1_epochs_lr1e-05_llava-v1.6-vicuna_full/step_100/gd_0.0001_forget10_1/step_36/eval_results/forget5_eval_log_aggregated.json   # retain_eval_retain_log.json
