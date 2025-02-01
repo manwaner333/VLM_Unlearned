@@ -414,8 +414,7 @@ def main(cfg):
                     kl_losses.append(kl_loss.detach().float())
                     loss = loss + kl_loss
             
-                progress_bar.set_description(
-                    f"Epoch {epoch} - Step {step} - LR: {optimizer.param_groups[0]['lr']:.2e} - loss: {loss:.4f}")
+                progress_bar.set_description(f"Epoch {epoch} - Step {step} - LR: {optimizer.param_groups[0]['lr']:.2e} - loss: {loss:.4f}")
 
                 total_loss += loss.detach().float()
                 losses.append(loss.detach().float())

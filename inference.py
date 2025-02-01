@@ -9,6 +9,7 @@ import gc
 from PIL import Image
 from tqdm import tqdm
 from rouge_score import rouge_scorer
+import torch.nn as nn
 from transformers import (
     AutoTokenizer, 
     AutoConfig, 
@@ -24,6 +25,9 @@ from transformers import (
     InstructBlipForConditionalGeneration
 )
 from peft import LoraConfig, get_peft_model
+import torch.distributed as dist
+
+
 
 random.seed(233)
 
@@ -64,13 +68,25 @@ def main(args):
         model.load_state_dict(torch.load(args.checkpoint_path), strict=False)
         model.merge_and_unload() 
     
-    model.half().to("cuda:1")
+    # dist.init_process_group(backend="nccl")
+    # Get the local GPU rank
+    # local_rank = dist.get_rank()
+    # torch.cuda.set_device(local_rank)  # Assign process to correct GPU
+
+    # num_gpus = torch.cuda.device_count()
+    # device = torch.device("cuda" if num_gpus > 0 else "cpu")
+    # if num_gpus > 1:
+    #     model = nn.DataParallel(model.half())
+    # model = model.to(device)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # model.half().to("cuda:0")
+    model.half().to(device)
     model.eval()
 
     
     with open(file, "r") as f:
-        person_data = [json.loads(line) for line in f.readlines()]
-        person_data = [line for line in person_data if line['unique_id'] in data_split[split]]
+        person_data = [json.loads(line) for line in f.readlines()][0:400]
+        # person_data = [line for line in person_data if line['unique_id'] in data_split[split]]  # 我将其注释掉的
     
     data = []
     for line in person_data:
@@ -87,12 +103,13 @@ def main(args):
     print(
         f"Full dataset length (only include fictitious examples): {len(data)}."
     )
-    eval_data = data[-200:]
+    # eval_data = data[-200:]  # 我将其进行的替换
+    eval_data = data
     print(
         f"Subset length of the full dataset for evaluation: {len(eval_data)}."
     )
 
-
+    count = 0
     nlls = []
     with open(f"./outputs/{args.model_name}_{split}_{loss_type}_{file_name}_results.json", "w") as f:
         rougeL_list = []
@@ -144,6 +161,7 @@ def main(args):
 
 
             outputs = {
+                    "image_path": image_path,
                     "question": question,
                     "answer": answer,
                     "prediction": prediction[:prediction.find(".") + 1].strip("")
@@ -156,7 +174,11 @@ def main(args):
             rougeL_list.append(rouge_scores['rougeL'].precision)
 
             print(outputs)
-            f.write(f"{json.dumps(outputs)}\n")  
+            f.write(f"{json.dumps(outputs)}\n") 
+            
+            count += 1
+            if count > 20:
+                break 
 
         print(
             f"Avg RougeL scores: {sum(rougeL_list) / len(rougeL_list)}"

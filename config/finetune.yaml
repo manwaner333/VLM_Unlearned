@@ -12,7 +12,7 @@ LoRA:
 loss_type: grad_ascent
 tune_vision_tower: False
 tune_mm_projector: True  # True
-tune_language_model: False  # True
+tune_language_model: True  # True
 data_path: ./dataset/full.json
 split: full # retain
 batch_size: 1  #3
@@ -20,7 +20,7 @@ gradient_accumulation_steps: 4
 max_grad_norm: 1.0
 num_epochs: 2    # 2
 save_dir: models/final_ft_${num_epochs}_epochs_lr${lr}_${model_family}_${split}
-save_steps: 100 # 210
+save_steps: 50  # 210
 lr: 1e-5
 weight_decay: 0.01
 seed: 233
